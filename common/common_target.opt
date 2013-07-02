@@ -1,22 +1,4 @@
-# comply with DESY inhouse installation target
-ifdef DESTDIR
-	INSTALL_DIR=$(DESTDIR)
-else
-# extended with standard path for shared/static libs
-ifeq ($(PROJECT_TYPE),DEVICE)
-	INSTALL_DIR=$(TANGO_HOME)/bin/server
-endif
-ifeq ($(PROJECT_TYPE),STATIC_LIB)
-ifdef CPP_SERVERS
-	INSTALL_DIR=$(CPP_SERVERS)/$(_libdir)
-else
-	INSTALL_DIR=$(TANGO_HOME)/$(_libdir)
-endif
-endif
-ifeq ($(PROJECT_TYPE),SHARED_LIB)
-	INSTALL_DIR=$(TANGO_HOME)/$(_libdir)
-endif
-endif
+INSTALL_DIR=$(TANGO_HOME)/bin
 
 #------------------------------------------------------------------------------
 #--  rule: ./*.cpp 
@@ -93,7 +75,7 @@ $(OBJ_DIR)/%.o: $(CPPDIRUSER)/%.c
 #------------------------------------------------------------------------------
 #-- all:
 #------------------------------------------------------------------------------
-all: $(SPECIFIC_ALL_TARGET) $(PROJECT_NAME)
+all: $(SPECIFIC_ALL_TARGET) $(PROJECT_NAME)  
 
 #------------------------------------------------------------------------------
 #-- $(PROJECT_NAME) for DEVICE:
@@ -176,39 +158,21 @@ endif
   
 #------------------------------------------------------------------------------
 #-- install:
-# extended for static and shared libs, HB
-# call all before installing so we can do all in one go
 #------------------------------------------------------------------------------
-
-install: all
-ifeq ($(PROJECT_TYPE),DEVICE)
+install:
 	@echo "Installing $(OUTPUT_DIR)/$(PROJECT_NAME)  to  $(INSTALL_DIR)"
-	cp $(OUTPUT_DIR)/$(PROJECT_NAME) $(INSTALL_DIR)
+ifeq ($(PROJECT_TYPE),DEVICE)
+	mv $(OUTPUT_DIR)/$(PROJECT_NAME) $(INSTALL_DIR)
 	ls -l $(INSTALL_DIR)/$(PROJECT_NAME)
 endif
-ifeq ($(PROJECT_TYPE),STATIC_LIB)
-	@echo "Installing $(OUTPUT_DIR)/lib$(PROJECT_NAME).a  to  $(INSTALL_DIR)"
-	cp $(OUTPUT_DIR)/lib$(PROJECT_NAME).a $(INSTALL_DIR)
-endif
-ifeq ($(PROJECT_TYPE),SHARED_LIB)
-	@echo "Installing $(OUTPUT_DIR)/lib$(PROJECT_NAME).so  to  $(INSTALL_DIR)"
-	cp $(OUTPUT_DIR)/lib$(PROJECT_NAME).so $(INSTALL_DIR)
-endif
-
 
 
 #------------------------------------------------------
 #	Tag the CVS/SVN module corresponding to this class
 #------------------------------------------------------
-# standard DESY tag, check for correct version numbering
-tag:
-ifeq ( $(shell ls -d ../tags/$(RELEASE)  2>/dev/null), ../tags/$(RELEASE))
-	@echo $(RELEASE) exists, specify new version numbers
-else
-	svn copy ../trunk ../tags/$(RELEASE)
-	svn commit ../tags/$(RELEASE) \
-	-m "Tagging the $(RELEASE) of the $(CLASS) project."
-endif
+
+tag: svn_tag
+
 svn_tag:
 	svn copy ../trunk ../tags/$(RELEASE)       
 	svn commit ../tags/$(RELEASE) \
