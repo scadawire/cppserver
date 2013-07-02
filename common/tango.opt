@@ -137,7 +137,8 @@ endif
 INCLUDE_DIRS =	-I../include -I.
 
 ifeq ($(TANGO_REQUIRED),TRUE)
-	INCLUDE_DIRS +=	-I$(TANGO_HOME)/include/tango -I$(OMNI_HOME)/include
+	INCLUDE_DIRS +=	-I$(TANGO_HOME)/include/tango -I$(OMNI_HOME)/include -I $(TANGO_DIR)/Libraries/cppserver/include
+
 endif
 
 INCLUDE_DIRS += $(INC_DIR_USER)
