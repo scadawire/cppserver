@@ -1,32 +1,74 @@
-#------------------------------------------------------------------------------
-#-- Architecture dependency
-#------------------------------------------------------------------------------
-ifndef _ARCH 
-	_ARCH = $(shell uname -m)
+# Distribution we compile for, HB
+_DISTRIBUTION=$(shell (lsb_release -i | awk '{print $$3}'))
+# -------------------------------
+#
+#
+ifndef _TANGO_VERSION
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
+	_TANGO_VERSION=$(shell (rpm -q --queryformat '%{VERSION}' tango | cut -d'.' -f1))
 endif
-
-ifeq ($(_ARCH), x86_64)
-	libdir = lib64
-else
-	libdir = lib
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+	_TANGO_VERSION=$(shell (pkg-config --modversion tango | cut -d'.' -f1))
 endif
-
-#--- svn local copy 
-
-CPPSERVER=$(TANGO_DIR)/Libraries/cppserver
+endif
 
 #------------------------------------------------------------------------------
 #-- TANGO_HOME
 #------------------------------------------------------------------------------
 ifndef TANGO_HOME
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
 	TANGO_HOME = /usr/local
+endif
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+	TANGO_HOME = /usr/
+endif
 endif
 
 #------------------------------------------------------------------------------
 #-- OMNI_HOME
 #------------------------------------------------------------------------------
 ifndef OMNI_HOME
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
 	OMNI_HOME = /usr/local
+endif
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+	OMNI_HOME = /usr/
+endif
+	OMNI_HOME = /usr/local
+endif
+
+#------------------------------------------------------------------------------
+#-- CPP_SERVERS, for DESY, HB
+#------------------------------------------------------------------------------
+ifndef CPP_SERVERS
+	CPP_SERVERS=$(TANGO_DIR)/Libraries/cppserver
+endif
+
+#------------------------------------------------------------------------------
+#-- UTIL_DIR, for DESY, HB
+#------------------------------------------------------------------------------
+ifndef UTIL_DIR
+	UTIL_DIR=$(TANGO_DIR)/Libraries/util/trunk
+endif
+
+#------------------------------------------------------------------------------
+#-- ARCHITECTURE and DISTRIBUTION for DESY, HB
+#------------------------------------------------------------------------------
+
+
+ifndef _ARCH 
+_ARCH = $(shell uname -m)
+endif
+
+ifeq ($(_ARCH), x86_64)
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
+	_libdir=lib64
+endif
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+	_libdir=lib
+endif
+else
+	_libdir=lib
 endif
 
 #------------------------------------------------------------------------------
@@ -92,13 +134,13 @@ endif
 #------------------------------------------------------------------------------
 #-- INCLUDE_DIRS 
 #------------------------------------------------------------------------------
-INCLUDE_DIRS  = $(INC_DIR_USER)
-INCLUDE_DIRS +=	-I../include -I. 
+INCLUDE_DIRS =	-I../include -I.
 
 ifeq ($(TANGO_REQUIRED),TRUE)
-	INCLUDE_DIRS +=	-I$(TANGO_HOME)/include/tango -I$(OMNI_HOME)/include -I$(CPPSERVER)/include
+	INCLUDE_DIRS +=	-I$(TANGO_HOME)/include/tango -I$(OMNI_HOME)/include
 endif
 
+INCLUDE_DIRS += $(INC_DIR_USER)
 
 #------------------------------------------------------------------------------
 #-- OBJ_DIR
@@ -117,10 +159,10 @@ ifeq ($(PROJECT_TYPE),DEVICE)
 	OUTPUT_DIR= $(HOME)/DeviceServers
 else
 ifeq ($(PROJECT_TYPE),STATIC_LIB)
-	OUTPUT_DIR=$(CPPSERVER)/$(libdir)
+	OUTPUT_DIR= ../$(_libdir)
 else
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
-	OUTPUT_DIR=$(CPPSERVER)/$(libdir)
+	OUTPUT_DIR= ../$(_libdir)
 else
 	OUTPUT_DIR= ../bin
 endif
@@ -141,9 +183,9 @@ endif
 CXXFLAGS =
 
 ifeq ($(RELEASE_TYPE),DEBUG)
-	CXXFLAGS +=	-g -D_DEBUG
+	CXXFLAGS +=	-g -D_DEBUG -Wall
 else
-	CXXFLAGS +=	-O2
+	CXXFLAGS +=	-O2 -Wall
 endif
 
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
@@ -155,6 +197,10 @@ ifdef CXXFLAGS_USR
 endif
 
 CXXFLAGS += -D_REENTRANT -W $(INCLUDE_DIRS) $(CXXFLAGS_USER)
+
+ifeq ($(_TANGO_VERSION), 8)
+	CXXFLAGS += -std=c++0x
+endif
 
 #------------------------------------------------------------------------------
 #-- CFLAGS
@@ -180,9 +226,7 @@ CFLAGS +=	-D_REENTRANT -W -pipe $(INCLUDE_DIRS) $(CFLAGS_USER)
 #------------------------------------------------------------------------------
 #-- LDFLAGS
 #------------------------------------------------------------------------------
-#
-
-LDFLAGS = 
+LDFLAGS =
 
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
 	LDFLAGS +=	-shared -O -Wl,-soname,lib$(PROJECT_NAME).so
@@ -192,14 +236,15 @@ ifdef LDFLAGS_USR
 	LDFLAGS_USER = $(LDFLAGS_USR)
 endif
 
-LDFLAGS += $(LDFLAGS_USER) $(LIB_DIR_USER)
-
-
+LDFLAGS +=	$(LDFLAGS_USER) $(LIB_DIR_USER)
 
 ifeq ($(TANGO_REQUIRED),TRUE)
-	LDFLAGS +=	-L$(TANGO_HOME)/$(libdir) -ltango -llog4tango
-	LDFLAGS +=	-L$(OMNI_HOME)/$(libdir) -lCOS4 -lomniORB4 -lomniDynamic4 -lomnithread
-	LDFLAGS +=	-L$(CPPSERVER)/$(libdir)
+	LDFLAGS +=	-L$(TANGO_HOME)/$(_libdir) -ltango -llog4tango
+	LDFLAGS +=	-L$(OMNI_HOME)/$(_libdir) -lCOS4 -lomniORB4 -lomniDynamic4 -lomnithread
 endif
 
-LDFLAGS += -ldl -lpthread -lstdc++
+LDFLAGS += -ldl -lpthread
+
+ifeq ($(_TANGO_VERSION), 8)
+	LDFLAGS += -lstdc++
+endif
