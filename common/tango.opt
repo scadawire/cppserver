@@ -224,6 +224,11 @@ endif
 
 CFLAGS +=	-D_REENTRANT -W -pipe $(INCLUDE_DIRS) $(CFLAGS_USER)
 
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+	CFLAGS += -D_FORTIFY_SOURCE=2
+	CXXFLAGS += -D_FORTIFY_SOURCE=2
+endif
+
 #------------------------------------------------------------------------------
 #-- LDFLAGS
 #------------------------------------------------------------------------------
@@ -231,6 +236,10 @@ LDFLAGS =
 
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
 	LDFLAGS +=	-shared -O -Wl,-soname,lib$(PROJECT_NAME).so
+endif
+
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+	LDFLAGS += -Wl,-z,relro
 endif
 
 ifdef LDFLAGS_USR
@@ -241,10 +250,14 @@ LDFLAGS +=	$(LDFLAGS_USER) $(LIB_DIR_USER)
 
 ifeq ($(TANGO_REQUIRED),TRUE)
 	LDFLAGS +=	-L$(TANGO_HOME)/$(_libdir) -ltango -llog4tango
-	LDFLAGS +=	-L$(OMNI_HOME)/$(_libdir) -lCOS4 -lomniORB4 -lomniDynamic4 -lomnithread
+	LDFLAGS +=	-L$(OMNI_HOME)/$(_libdir) -lomniORB4 -lomniDynamic4 -lomnithread
 endif
 
-LDFLAGS += -ldl -lpthread
+ifeq ($(_TANGO_VERSION), 7)
+	LDFLAGS += -lCOS4 -ldl
+endif
+
+LDFLAGS += -lpthread
 
 ifeq ($(_TANGO_VERSION), 8)
 	LDFLAGS += -lstdc++
