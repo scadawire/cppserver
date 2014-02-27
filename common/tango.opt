@@ -214,6 +214,10 @@ else
 	CFLAGS +=	-O2
 endif
 
+ifeq ($(_TANGO_VERSION), 8)
+	CFLAGS += -std=c++0x
+endif
+
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
 	CFLAGS +=	-fPIC
 endif
