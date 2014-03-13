@@ -34,7 +34,6 @@ endif
 ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
 	OMNI_HOME = /usr/
 endif
-	OMNI_HOME = /usr/local
 endif
 
 #------------------------------------------------------------------------------
