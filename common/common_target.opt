@@ -221,3 +221,6 @@ cvs_tag:
 
 show_cvs_tag:
 	@cvstag -d
+
+version:
+	@echo $(MAJOR_VERS).$(MINOR_VERS)
