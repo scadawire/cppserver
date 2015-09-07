@@ -156,7 +156,7 @@ OBJDIR = $(OBJ_DIR)
 #------------------------------------------------------------------------------
 ifndef OUTPUT_DIR
 ifeq ($(PROJECT_TYPE),DEVICE)
-	OUTPUT_DIR = ./bin
+	OUTPUT_DIR= ./bin
 else
 ifeq ($(PROJECT_TYPE),STATIC_LIB)
 	OUTPUT_DIR= ./$(_libdir)

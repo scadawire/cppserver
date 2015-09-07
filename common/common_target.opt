@@ -1,4 +1,8 @@
 # comply with DESY inhouse installation target
+# compatibality with older Makefiles
+ifdef OUTPUT_TYPE
+	PROJECT_TYPE=$(OUTPUT_TYPE)
+endif
 ifdef DESTDIR
 	INSTALL_DIR=$(DESTDIR)
 else
@@ -17,6 +21,7 @@ ifeq ($(PROJECT_TYPE),SHARED_LIB)
 	INSTALL_DIR=$(TANGO_HOME)/$(_libdir)
 endif
 endif
+
 
 #------------------------------------------------------------------------------
 #--  rule: ./*.cpp 
@@ -126,10 +131,10 @@ ifdef EXTERNAL_LIBS
 		cd $(OBJ_DIR)/external_libs && \
 		for EXTERNAL_LIB in $(EXTERNAL_LIBS); do ar x $$EXTERNAL_LIB; done && \
 		cd -
-		ar rcs $(OUTPUT_DIR)/lib$(PROJECT_NAME).a $(SVC_OBJS) $(OBJ_DIR)/external_libs/*.o
+		ar rcs $(OUTPUT_DIR)/lib$(PROJECT_NAME).a $(LIB_OBJS) $(OBJ_DIR)/external_libs/*.o
 		rm -f $(OBJ_DIR)/external_libs/*
 else
-		ar rcs $(OUTPUT_DIR)/lib$(PROJECT_NAME).a $(SVC_OBJS)
+		ar rcs $(OUTPUT_DIR)/lib$(PROJECT_NAME).a $(LIB_OBJS)
 endif
 endif
 
@@ -139,7 +144,7 @@ endif
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
 $(PROJECT_NAME):    diretories	$(SVC_OBJS)
 		@echo "Linking shared library "$(OUTPUT_DIR)/lib$(PROJECT_NAME).so
-		$(CXX) $(SVC_OBJS) $(LDFLAGS) -o $(OUTPUT_DIR)/lib$(PROJECT_NAME).so
+		$(CXX) $(LIB_OBJS) $(LDFLAGS) -o $(OUTPUT_DIR)/lib$(PROJECT_NAME).so
 		@echo "Link successfull"
 endif
 
