@@ -221,6 +221,10 @@ ifeq ($(_TANGO_VERSION), 8)
 	CFLAGS += -std=c++0x
 endif
 
+ifeq ($(_TANGO_VERSION), 9)
+	CFLAGS += -std=c++11
+endif
+
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
 	CFLAGS +=	-fPIC
 endif
@@ -267,5 +271,9 @@ endif
 LDFLAGS += -lpthread
 
 ifeq ($(_TANGO_VERSION), 8)
+	LDFLAGS += -lstdc++
+endif
+
+ifeq ($(_TANGO_VERSION), 9)
 	LDFLAGS += -lstdc++
 endif
