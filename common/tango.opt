@@ -203,7 +203,7 @@ ifeq ($(_TANGO_VERSION), 8)
 endif
 
 ifeq ($(_TANGO_VERSION), 9)
-	CXXFLAGS += -std=c++11
+	CXXFLAGS += -std=gnu++1y
 endif
 
 #------------------------------------------------------------------------------
