@@ -7,7 +7,7 @@ ifndef _TANGO_VERSION
 ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
 	_TANGO_VERSION=$(shell (rpm -q --queryformat '%{VERSION}' tango | cut -d'.' -f1))
 endif
-ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian Raspbian))
 	_TANGO_VERSION=$(shell (pkg-config --modversion tango | cut -d'.' -f1))
 endif
 endif
@@ -19,7 +19,7 @@ ifndef TANGO_HOME
 ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
 	TANGO_HOME = /usr/local
 endif
-ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian Raspbian))
 	TANGO_HOME = /usr/
 endif
 endif
@@ -31,7 +31,7 @@ ifndef OMNI_HOME
 ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
 	OMNI_HOME = /usr/local
 endif
-ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian Raspbian))
 	OMNI_HOME = /usr/
 endif
 endif
@@ -63,7 +63,7 @@ ifeq ($(_ARCH), x86_64)
 ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
 	_libdir=lib64
 endif
-ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian Raspbian))
 	_libdir=lib
 endif
 else
@@ -235,7 +235,7 @@ endif
 
 CFLAGS +=	-D_REENTRANT -W -pipe $(INCLUDE_DIRS) $(CFLAGS_USER)
 
-ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian Raspbian))
 	CFLAGS += -D_FORTIFY_SOURCE=2
 	CXXFLAGS += -D_FORTIFY_SOURCE=2
 endif
@@ -249,7 +249,7 @@ ifeq ($(PROJECT_TYPE),SHARED_LIB)
 	LDFLAGS +=	-shared -O -Wl,-soname,lib$(PROJECT_NAME).so
 endif
 
-ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian))
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian Raspbian))
 	LDFLAGS += -Wl,-z,relro
 endif
 
