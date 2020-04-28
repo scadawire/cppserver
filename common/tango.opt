@@ -62,9 +62,22 @@ endif
 ifeq ($(_ARCH), x86_64)
 ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
 	_libdir=lib64
+	_sysname=lib64
 endif
 ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian Raspbian))
 	_libdir=lib
+	_sysname=x86_64-linux-gnu
+endif
+else
+	_libdir=lib
+endif
+ifeq ($(_ARCH), armv7l)
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
+	_libdir=lib64
+endif
+ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian Raspbian))
+	_libdir=lib
+	_sysname=arm-linux-gnueabihf
 endif
 else
 	_libdir=lib
