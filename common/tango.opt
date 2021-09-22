@@ -216,7 +216,7 @@ ifeq ($(_TANGO_VERSION), 8)
 endif
 
 ifeq ($(_TANGO_VERSION), 9)
-	CXXFLAGS += -std=gnu++1y
+    CXXFLAGS +=  -std=c++17
 endif
 
 #------------------------------------------------------------------------------
