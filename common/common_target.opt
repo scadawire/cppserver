@@ -154,8 +154,8 @@ endif
 #------------------------------------------------------------------------------
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
 $(PROJECT_NAME):    diretories	$(SVC_OBJS)
-		@echo "Linking shared library "$(OUTPUT_DIR)/lib$(PROJECT_NAME).so
-		$(CXX) $(LIB_OBJS) $(LDFLAGS) -o $(OUTPUT_DIR)/lib$(PROJECT_NAME).so
+		@echo "Linking shared library "lib$(PROJECT_NAME)-$(MAJOR_VERS).$(MINOR_VERS).so
+		$(CXX) $(LIB_OBJS) $(LDFLAGS) -o $(OUTPUT_DIR)/lib$(PROJECT_NAME)-$(MAJOR_VERS).$(MINOR_VERS).so
 		@echo "Link successfull"
 endif
 
@@ -171,7 +171,7 @@ diretories:
 #-- clean:
 #------------------------------------------------------------------------------
 clean: $(SPECIFIC_CLEAN_TARGET)
-	@echo "Cleaning "$(PROJECT_NAME)
+	@echo "Cleaning " $(PROJECT_NAME)
 ifdef OBJ_DIR
 ifneq ($(OBJ_DIR),/tmp)
 	rm -rf $(OBJ_DIR)
@@ -187,7 +187,7 @@ ifeq ($(PROJECT_TYPE),STATIC_LIB)
 	rm -f $(OUTPUT_DIR)/lib$(PROJECT_NAME).a
 endif
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
-	rm -f $(OUTPUT_DIR)/lib$(PROJECT_NAME).so
+	rm -f $(OUTPUT_DIR)/lib$(PROJECT_NAME)*.so
 endif
   
 #------------------------------------------------------------------------------
@@ -207,8 +207,12 @@ ifeq ($(PROJECT_TYPE),STATIC_LIB)
 	cp $(OUTPUT_DIR)/lib$(PROJECT_NAME).a $(INSTALL_DIR)
 endif
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
-	@echo "Installing $(OUTPUT_DIR)/lib$(PROJECT_NAME).so  to  $(INSTALL_DIR)"
-	cp $(OUTPUT_DIR)/lib$(PROJECT_NAME).so $(INSTALL_DIR)
+	@echo "Installing $(OUTPUT_DIR)/lib$(PROJECT_NAME).so files to $(INSTALL_DIR)"
+	# cp $(OUTPUT_DIR)/lib$(PROJECT_NAME).so $(INSTALL_DIR)
+	#cp $(OUTPUT_DIR)/lib$(PROJECT_NAME)-$(MAJOR_VERS).$(MINOR_VERS).so $(INSTALL_DIR)
+	cd $(OUTPUT_DIR) && ln -s lib$(PROJECT_NAME)-$(MAJOR_VERS).$(MINOR_VERS).so lib$(PROJECT_NAME)-$(MAJOR_VERS).so
+	cd $(OUTPUT_DIR) && ln -s lib$(PROJECT_NAME)-$(MAJOR_VERS).$(MINOR_VERS).so lib$(PROJECT_NAME).so
+	cp -P $(OUTPUT_DIR)/lib$(PROJECT_NAME)*.so $(INSTALL_DIR) 
 endif
 
 

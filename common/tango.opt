@@ -216,7 +216,7 @@ ifeq ($(_TANGO_VERSION), 8)
 endif
 
 ifeq ($(_TANGO_VERSION), 9)
-    CXXFLAGS +=  -std=c++17
+    CXXFLAGS +=  -std=c++14
 endif
 
 #------------------------------------------------------------------------------
@@ -259,7 +259,7 @@ endif
 LDFLAGS =
 
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
-	LDFLAGS +=	-shared -O -Wl,-soname,lib$(PROJECT_NAME).so
+	LDFLAGS +=	-shared -O -Wl,-soname,lib$(PROJECT_NAME)-$(MAJOR_VERS).$(MINOR_VERS).so
 endif
 
 ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian Raspbian))
