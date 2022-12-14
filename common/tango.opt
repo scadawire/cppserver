@@ -215,9 +215,9 @@ ifeq ($(_TANGO_VERSION), 8)
 	CXXFLAGS += -std=c++0x
 endif
 
-ifeq ($(_TANGO_VERSION), 9)
-    CXXFLAGS +=  -std=c++14
-endif
+#ifeq ($(_TANGO_VERSION), 9)
+#    CXXFLAGS +=  -std=c++14
+#endif
 
 #------------------------------------------------------------------------------
 #-- CFLAGS
@@ -234,9 +234,9 @@ ifeq ($(_TANGO_VERSION), 8)
 	CFLAGS += -std=c++0x
 endif
 
-ifeq ($(_TANGO_VERSION), 9)
-	CFLAGS += -std=c++11
-endif
+#ifeq ($(_TANGO_VERSION), 9)
+#	CFLAGS += -std=c++11
+#endif
 
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
 	CFLAGS +=	-fPIC
