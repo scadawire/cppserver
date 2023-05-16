@@ -5,10 +5,10 @@ _DISTRIBUTION=$(shell (lsb_release -i | awk '{print $$3}'))
 #
 ifndef _TANGO_VERSION
 ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Scientific ScientificSL))
-	_TANGO_VERSION=$(shell (rpm -q --queryformat '%{VERSION}' tango | cut -d'.' -f1))
+	_TANGO_VERSION=$(shell (rpm -q --queryformat '%{VERSION}' tango | cut -d'.' -f1,2))
 endif
 ifeq ($(_DISTRIBUTION), $(filter $(_DISTRIBUTION), Ubuntu Debian Raspbian))
-	_TANGO_VERSION=$(shell (pkg-config --modversion tango | cut -d'.' -f1))
+	_TANGO_VERSION=$(shell (pkg-config --modversion tango | cut -d'.' -f1,2))
 endif
 endif
 
@@ -209,15 +209,25 @@ ifdef CXXFLAGS_USR
 	CXXFLAGS_USER = $(CXXFLAGS_USR)
 endif
 
+
 CXXFLAGS += -D_REENTRANT -W $(INCLUDE_DIRS) $(CXXFLAGS_USER)
 
+ifndef CPPSTD
 ifeq ($(_TANGO_VERSION), 8)
-	CXXFLAGS += -std=c++0x
+	CPPSTD = -std=c++0x
 endif
 
-#ifeq ($(_TANGO_VERSION), 9)
-#    CXXFLAGS +=  -std=c++14
-#endif
+ifeq ($(_TANGO_VERSION), 9.3)
+    CPPSTD = -std=c++0x
+endif
+
+ifeq ($(_TANGO_VERSION), 9.4)
+    CPPSTD =  -std=c++14
+endif
+endif
+CXXFLAGS += $(CPPSTD)
+
+
 
 #------------------------------------------------------------------------------
 #-- CFLAGS
@@ -234,9 +244,13 @@ ifeq ($(_TANGO_VERSION), 8)
 	CFLAGS += -std=c++0x
 endif
 
-#ifeq ($(_TANGO_VERSION), 9)
-#	CFLAGS += -std=c++11
-#endif
+ifeq ($(_TANGO_VERSION), 9.3)
+	CFLAGS += -std=c++0x
+endif
+
+ifeq ($(_TANGO_VERSION), 9.4)
+    CXXFLAGS +=  -std=c++14
+endif
 
 ifeq ($(PROJECT_TYPE),SHARED_LIB)
 	CFLAGS +=	-fPIC
@@ -287,6 +301,10 @@ ifeq ($(_TANGO_VERSION), 8)
 	LDFLAGS += -lstdc++
 endif
 
-ifeq ($(_TANGO_VERSION), 9)
+ifeq ($(_TANGO_VERSION), 9.3)
+	LDFLAGS += -lstdc++
+endif
+
+ifeq ($(_TANGO_VERSION), 9.3)
 	LDFLAGS += -lstdc++
 endif
